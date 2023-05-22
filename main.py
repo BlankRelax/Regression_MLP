@@ -5,14 +5,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.impute import SimpleImputer
+from keras_sequential_ascii import keras2ascii
 
 ###########################Data Wrangling######################################
+pd.set_option('display.max_columns', None)
+df = pd.read_csv(r'C:\Users\Hassaan\OneDrive\SPA7033U\CW2\life_exp\Life_Expectancy_Data.csv') # change directory here if you want to run it for yourself
 
-df = pd.read_csv(r'C:\Users\Hassaan\OneDrive\SPA7033U\CW2\life_exp\Life_Expectancy_Data.csv')
 df = df.drop(columns=['Country', 'Year'])
 df['Status']=pd.Categorical(df['Status'])
 df['Status']=df['Status'].cat.codes
-print(df)
+
 columns = df.columns
 for var in columns:
     # plt.scatter(df[var], df['Life expectancy '])
@@ -33,7 +35,7 @@ y_df = df['Life expectancy ']
 X_df = df.drop(columns=['Life expectancy '])
 print(df.columns)
 columns=X_df.columns
-
+print(df.loc[:4, :])
 
 
 
@@ -52,32 +54,41 @@ print(y_test.shape)
 
 
 #########################Regression Analysis####################################################################
-Dropout_Val = 0.6
 
-model = tf.keras.models.Sequential([
-    tf.keras.layers.Dense(1024, activation=tf.keras.layers.LeakyReLU(alpha=0.1), input_shape=(14,)),
-    tf.keras.layers.Dense(1024, activation=tf.keras.layers.LeakyReLU(alpha=0.1)),
-    tf.keras.layers.Dropout(Dropout_Val),
-    tf.keras.layers.Dense(512, activation=tf.keras.layers.LeakyReLU(alpha=0.1)),
-    tf.keras.layers.Dense(512, activation=tf.keras.layers.LeakyReLU(alpha=0.1)),
-    tf.keras.layers.Dropout(Dropout_Val),
-    tf.keras.layers.Dense(256, activation=tf.keras.layers.LeakyReLU(alpha=0.1)),
-    tf.keras.layers.Dense(256, activation=tf.keras.layers.LeakyReLU(alpha=0.1)),
-    tf.keras.layers.Dense(128, activation=tf.keras.layers.LeakyReLU(alpha=0.1)),
-    tf.keras.layers.Dense(128, activation=tf.keras.layers.LeakyReLU(alpha=0.1)),
-    tf.keras.layers.Dropout(Dropout_Val),
-    tf.keras.layers.Dense(64, activation=tf.keras.layers.LeakyReLU(alpha=0.1)),
-    tf.keras.layers.Dense(32, activation=tf.keras.layers.LeakyReLU(alpha=0.1)),
-    tf.keras.layers.Dense(32, activation=tf.keras.layers.LeakyReLU(alpha=0.1)),
-    tf.keras.layers.Dense(16, activation=tf.keras.layers.LeakyReLU(alpha=0.1)),
-    tf.keras.layers.Dense(1)
-])
 
+
+class NN_seq:
+
+    def __init__(self, nodes, activation, input):
+        self.model = tf.keras.models.Sequential()
+        self.dropoutval = 0.6
+        if activation == 'LR':
+            self.model.add(tf.keras.layers.Dense(nodes, activation=tf.keras.layers.LeakyReLU(alpha=0.1), input_shape=(input, )))
+
+    def add_dense(self, nodes_layers, activation):
+            if activation == 'LR':
+                i=1
+                for num in nodes_layers:
+                    if i%2==0 and num>64:
+                        self.model.add(tf.keras.layers.Dropout(self.dropoutval))
+                    self.model.add(tf.keras.layers.Dense(num, activation=tf.keras.layers.LeakyReLU(alpha=0.1)))
+                    i+=1
+    def add_output_layer(self, nodes):
+        self.model.add(tf.keras.layers.Dense(nodes))
+
+
+
+m = NN_seq(1028, 'LR', 14)
+m.add_dense([1028,1028,512,512,256, 256,128,128,64,64,32,16], 'LR')
+m.add_output_layer(1)
+
+model = m.model
+print(keras2ascii(model))
 loss_func = tf.keras.losses.MeanSquaredError()
 learning_rate=0.0001
-
+callback = tf.keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=0.0000001, patience=5, restore_best_weights=True)
 model.compile(optimizer=tf.optimizers.Adam(learning_rate=learning_rate), loss=loss_func)
-history  = model.fit(X_train, y_train, validation_split=0.2, batch_size=32, epochs=250)
+history  = model.fit(X_train, y_train, validation_split=0.2, batch_size=32, epochs=200)
 
 loss = model.evaluate(X_test,  y_test, verbose=2)
 print("loss = {:5.3f}".format(loss))

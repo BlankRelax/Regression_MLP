@@ -1,9 +1,5 @@
 import tensorflow as tf
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-from sklearn.model_selection import train_test_split
-from sklearn.impute import SimpleImputer
+
 from keras_sequential_ascii import keras2ascii
 
 
@@ -25,10 +21,12 @@ class NN_seq:
                     i+=1
     def add_output_layer(self, nodes):
         self.model.add(tf.keras.layers.Dense(nodes))
+    def printmodel(self):
+        print(keras2ascii(self.model))
 
 
 
-# m = NN_seq(1028, 'LR', 14)
-# m.add_dense([1028,1028,512,512,256, 256,128,128,64,64,32,16], 'LR')
-# m.add_output_layer(1)
-# print(keras2ascii(m.model))
+m = NN_seq(1028, 'LR', 14)
+m.add_dense([1028,1028,512,512,256, 256,128,128,64,64,32,16], 'LR')
+m.add_output_layer(1)
+m.printmodel()

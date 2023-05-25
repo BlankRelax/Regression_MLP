@@ -61,7 +61,7 @@ m.add_dense([1028,1028,512,512,256, 256,128,128,64,64,32,16], 'LR')
 m.add_output_layer(1)
 
 model = m.model
-print(keras2ascii(model))
+m.printmodel()
 loss_func = tf.keras.losses.MeanSquaredError()
 learning_rate=0.0001
 callback = tf.keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=0.0000001, patience=5, restore_best_weights=True)

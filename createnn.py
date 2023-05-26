@@ -11,6 +11,7 @@ class NN_seq:
             self.model.add(tf.keras.layers.Dense(nodes, activation=tf.keras.layers.LeakyReLU(alpha=0.1), input_shape=(input, )))
 
 
+
     def add_dense(self, nodes_layers, activation):
             if activation == 'LR':
                 i=1
@@ -50,12 +51,13 @@ class CNN(NN_seq):
 
 
 
+
 # m = NN_seq(1028, 'LR', 14)
 # m.add_dense([1028,1028,512,512,256, 256,128,128,64,64,32,16], 'LR')
 # m.add_output_layer(1)
 # m.printmodel()
-m = CNN(64, (3, 3), 'relu',(256,256,3))
-m.add_Conv2D([64,32,32,32,128], [(3,3), (3,3), (3,3), (3,3), (5,5)], ['relu', 'relu', 'relu', 'relu', 'relu'], [(2,2), (2,2), (2,2), (2,2)],
-             ['avg2d', 'max2d', 'max2d','max2d', 'globmax2d'])
-m.add_dense([128, 64, 32, 1], ['relu', 'relu', 'relu','sigmoid'])
-m.printmodel()
+# m = CNN(64, (3, 3), 'relu',(256,256,3))
+# m.add_Conv2D([64,32,32,32,128], [(3,3), (3,3), (3,3), (3,3), (5,5)], ['relu', 'relu', 'relu', 'relu', 'relu'], [(2,2), (2,2), (2,2), (2,2)],
+#              ['avg2d', 'max2d', 'max2d','max2d', 'globmax2d'])
+# m.add_dense([128, 64, 32, 1], ['relu', 'relu', 'relu','sigmoid'])
+# m.printmodel()
